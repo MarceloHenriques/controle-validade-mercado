@@ -24,7 +24,7 @@ st.set_page_config(
 # Conexão com a planilha via Google Apps Script (Web App)
 # ---------------------------------------------------------
 # Cole aqui o link gerado na etapa "Publicar como App da Web".
-URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbx-c3ll0wmS5E4RKjGvJ9J2yDtmfyXuSV60xf0pdZMI78xwE0BrYuh3ViSlToCgGQxn/exec"
+URL_APPS_SCRIPT = "https://script.google.com/a/macros/ufms.br/s/AKfycbyQdF9LYCNK6b98KKk9LELRADqLKH6cWv-pcQ0kg6kUP_m1uV3DNSL1Lqr-Bh0inSng/exec"
 
 COLUNAS = ["Produto", "Categoria", "Data de entrada", "Data de validade", "Quantidade"]
 
