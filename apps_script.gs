@@ -15,12 +15,18 @@ function doGet(e) {
   return responder(lerAba(ABA_LOTES, CABECALHO_LOTES));
 }
 
-// Recebe cadastros de lote e baixas (POST)
+// Recebe cadastros, baixas, edições e exclusões (POST)
 function doPost(e) {
   var corpo = JSON.parse(e.postData.contents);
 
   if (corpo.acao === "baixa") {
     return responder(darBaixa(corpo));
+  }
+  if (corpo.acao === "editar") {
+    return responder(editarLote(corpo));
+  }
+  if (corpo.acao === "excluir") {
+    return responder(excluirLote(corpo));
   }
   return responder(cadastrarLote(corpo));
 }
@@ -96,6 +102,54 @@ function cadastrarLote(corpo) {
   return {status: "ok", id: id};
 }
 
+// Edita os dados de um lote existente, localizado pelo ID
+function editarLote(corpo) {
+  var aba = pegarAba(ABA_LOTES, CABECALHO_LOTES);
+  var dados = aba.getDataRange().getValues();
+  var cabecalho = dados[0];
+  var colId = cabecalho.indexOf("ID");
+
+  if (colId === -1) {
+    return {status: "erro", mensagem: "Coluna ID não encontrada. Rode a função prepararPlanilha()."};
+  }
+
+  for (var i = 1; i < dados.length; i++) {
+    if (String(dados[i][colId]) === String(corpo.id)) {
+      var nova = dados[i].slice();
+      nova[cabecalho.indexOf("Produto")] = corpo.produto;
+      nova[cabecalho.indexOf("Categoria")] = corpo.categoria;
+      nova[cabecalho.indexOf("Data de entrada")] = corpo.data_entrada;
+      nova[cabecalho.indexOf("Data de validade")] = corpo.data_validade;
+      nova[cabecalho.indexOf("Quantidade")] = Number(corpo.quantidade);
+
+      aba.getRange(i + 1, 1, 1, cabecalho.length).setValues([nova]);
+      return {status: "ok"};
+    }
+  }
+
+  return {status: "erro", mensagem: "Lote não encontrado."};
+}
+
+// Apaga a linha de um lote, localizado pelo ID
+function excluirLote(corpo) {
+  var aba = pegarAba(ABA_LOTES, CABECALHO_LOTES);
+  var dados = aba.getDataRange().getValues();
+  var colId = dados[0].indexOf("ID");
+
+  if (colId === -1) {
+    return {status: "erro", mensagem: "Coluna ID não encontrada. Rode a função prepararPlanilha()."};
+  }
+
+  for (var i = 1; i < dados.length; i++) {
+    if (String(dados[i][colId]) === String(corpo.id)) {
+      aba.deleteRow(i + 1);
+      return {status: "ok"};
+    }
+  }
+
+  return {status: "erro", mensagem: "Lote não encontrado."};
+}
+
 // Dá baixa (venda ou descarte) em um lote
 function darBaixa(corpo) {
   var quantidadeBaixa = Number(corpo.quantidade);
@@ -168,8 +222,4 @@ function prepararPlanilha() {
       aba.getRange(i + 1, colId + 1).setValue(gerarId());
     }
   }
-}
-
-  return ContentService.createTextOutput(JSON.stringify({status: "ok"}))
-    .setMimeType(ContentService.MimeType.JSON);
 }
