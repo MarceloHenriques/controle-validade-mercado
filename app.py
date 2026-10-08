@@ -448,7 +448,7 @@ with aba_baixas:
 
 st.caption("Protótipo desenvolvido para fins acadêmicos — Projeto Integrador em Ciência de Dados I (UFMS Digital).")
 
-with aba_desc:
-    aba_descartes(movimentos)
+with aba_baixas:
+    aba_baixados(movimentos)
 
 st.caption("Protótipo desenvolvido para fins acadêmicos — Projeto Integrador em Ciência de Dados I (UFMS Digital).")
