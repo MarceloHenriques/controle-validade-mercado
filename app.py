@@ -33,6 +33,11 @@ CATEGORIAS = ["Laticínios", "Mercearia", "Bebidas", "Enlatados", "Hortifruti", 
 MOTIVOS = ["Vencido", "Avariado", "Outro"]
 
 
+def converter_data(serie):
+    # Deixa todas as datas no mesmo formato, sem fuso horário
+    return pd.to_datetime(serie, errors="coerce", utc=True).dt.tz_localize(None).dt.normalize()
+
+
 def carregar_lotes():
     resposta = requests.get(URL_APPS_SCRIPT, timeout=15)
     resposta.raise_for_status()
@@ -43,8 +48,8 @@ def carregar_lotes():
     if "ID" not in df.columns:
         df["ID"] = ""
     df["ID"] = df["ID"].astype(str)
-    df["Data de entrada"] = pd.to_datetime(df["Data de entrada"])
-    df["Data de validade"] = pd.to_datetime(df["Data de validade"])
+    df["Data de entrada"] = converter_data(df["Data de entrada"])
+    df["Data de validade"] = converter_data(df["Data de validade"])
     df["Quantidade"] = df["Quantidade"].astype(int)
     return df
 
@@ -56,7 +61,7 @@ def carregar_movimentos():
     if not registros:
         return pd.DataFrame(columns=COLUNAS_MOVIMENTOS)
     df = pd.DataFrame(registros)
-    df["Data"] = pd.to_datetime(df["Data"])
+    df["Data"] = converter_data(df["Data"])
     df["Quantidade"] = df["Quantidade"].astype(int)
     df["Motivo"] = df["Motivo"].fillna("")
     return df
